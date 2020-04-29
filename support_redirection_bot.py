@@ -25,7 +25,7 @@ from urllib.parse import urljoin
 from flask import Flask, request
 
 from webexteamssdk import WebexTeamsAPI, Webhook
-from config import WEBEX_TEAMS_ACCESS_TOKEN, PORT, WEBHOOK_URL, DESTINATION_SPACE_ID
+from config import WEBEX_TEAMS_ACCESS_TOKEN, PORT, WEBHOOK_URL, TEXT1, TEXT2, TEXT3, TEXT4, BOTTITLE, DESTINATION_SPACE_ID
 
 
 # Constants
@@ -46,23 +46,27 @@ CARD_CONTENT = {
     "body": [
         {
             "type": "TextBlock",
-            "text": "Please type in your requirement: ",
+            "text": TEXT1,
+            "size": "ExtraLarge",
+            "weight": "bolder",
+            "height": "stretch",
+            "wrap": True
+        },
+        {
+            "type": "TextBlock",
+            "text": TEXT2,
             "size": "medium",
             "weight": "bolder"
         },
         {
-            "type": "TextBlock",
-            "text": "Enter your request in the following field, an agent will contact you once it is received ",
-            "wrap": True
-        },
-        {
             "type": "Input.Text",
-            "placeholder": "Type your requirement HERE",
+            "id": "TextFieldVal",
+            "placeholder": TEXT3,
             "style": "text",
             "maxLength": 0,
-            "id": "TextFieldVal"
-        },
-        
+            "isMultiline": True,            
+            "style": "text"                                   
+        },        
     ],
     "actions": [
         {
@@ -73,7 +77,8 @@ CARD_CONTENT = {
             }
             
         }
-    ]
+    ],
+    #"minHeight": "300px"
 }
 
 # Module variables
@@ -145,12 +150,12 @@ def respond_to_button_press(webhook):
         f"""
         NEW BUTTON PRESS IN ROOM '{room.title}'
         FROM '{person.displayName}' EMAIL '{person.emails}
-        """ 
+        """
     )
     api.messages.create(
         room.id,
         parentId=message_id,
-        markdown=f"Your request has been received"
+        markdown= TEXT4
     )
     #Now we will send the query to the team space that receives the cases
     if len(person.emails) >= 1:
@@ -194,7 +199,7 @@ def respond_to_message(webhook):
         # Message was sent by someone else; parse message and respond.
         api.messages.create(
             room.id,
-            text="Incident reporting Bot:",
+            text=BOTTITLE,
         )
         api.messages.create(
             room.id,
